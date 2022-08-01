@@ -1,0 +1,13 @@
+name: ImperialItems
+version: '${project.version}'
+main: ru.imperiamc.imperialitems.ImperialItems
+api-version: 1.19
+authors: [ twistofthemyth ]
+website: imperia-mc.ru
+commands:
+  addrule:
+    description: add item replacement rule
+    usage: /<command>
+  updateitem:
+    description: add item replacement rule
+    usage: /<command>
