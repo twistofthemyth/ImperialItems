@@ -17,8 +17,6 @@ public interface RuleManager {
 
     void load();
 
-    void load(@NotNull Material material);
-
     void save();
 
     void save(@NotNull Material material);
