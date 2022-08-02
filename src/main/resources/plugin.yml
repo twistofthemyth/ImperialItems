@@ -11,3 +11,12 @@ commands:
   ii add:
     description: add item replacement rule
     usage: /<command>
+  ii addlore:
+    description: add item replacement rule
+    usage: /<command>
+  ii addalore:
+    description: add item replacement rule
+    usage: /<command>
+  ii reload:
+    description: add item replacement rule
+    usage: /<command>

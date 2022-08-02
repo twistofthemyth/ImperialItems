@@ -27,7 +27,7 @@ public final class ImperialItems extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        ruleManager.save();
     }
 
     private void createDataFolder() {

@@ -29,13 +29,11 @@ public class ItemListener implements Listener {
         if (item.hasItemMeta() && item.getItemMeta().hasLore()) {
             LOG.info("Начинаем проверку для предмета \n" + item.getType());
             RuleManager ruleManager = ImperialItems.getInstance().getRuleManager();
-            String loreSign = ruleManager.getLoreSign(item.getType(), Objects.requireNonNull(item.lore()));
-            if (loreSign != null) {
-                LOG.info("Найдено правило '" + loreSign + "'");
-                ItemMo newItem = ruleManager.getRuleItem(item.getType(), loreSign);
-                ItemMo oldItem = new ItemMo(item);
-                if (!newItem.equals(oldItem)) {
-                    updateItemMeta(item, newItem.toItemStack());
+            ItemMo oldItem = new ItemMo(item);
+            ItemMo replacement = ruleManager.getReplacement(new ItemMo(item));
+            if (replacement != null) {
+                if (!replacement.equals(oldItem)) {
+                    updateItemMeta(item, replacement.toItemStack());
                     LOG.info("Предмет заменен");
                 }
             }

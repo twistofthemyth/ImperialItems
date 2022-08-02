@@ -98,6 +98,10 @@ public class ItemMo {
         return itemStack;
     }
 
+    public boolean hasLore(String str) {
+        return this.getLore().stream().anyMatch(e -> e.getText().contains(str));
+    }
+
     private static AttributeMo toAttributeModel(Attribute attribute, AttributeModifier modifier) {
         return new AttributeMo(attribute, modifier.getSlot() == null ? EquipmentSlot.HAND : modifier.getSlot(),
                 modifier.getOperation(), modifier.getAmount());
