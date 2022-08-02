@@ -19,7 +19,7 @@ import java.util.Objects;
 public class ItemListener implements Listener {
 
     @EventHandler
-    public void onChangeItem(PlayerItemHeldEvent event) {
+    public void onItemHeld(PlayerItemHeldEvent event) {
         Player player = event.getPlayer();
         boolean result = itemSoftUpdate(player);
         if (result) {
@@ -42,7 +42,7 @@ public class ItemListener implements Listener {
         Arrays.stream(player.getInventory().getContents()).filter(Objects::nonNull).forEach(this::tryToUpdateItem);
     }
 
-    public boolean tryToUpdateItem(@NotNull ItemStack item) {
+    private boolean tryToUpdateItem(@NotNull ItemStack item) {
         if (item.hasItemMeta() && item.getItemMeta().hasLore()) {
             RuleManager ruleManager = ImperialItems.getInstance().getRuleManager();
             ItemMo oldItem = new ItemMo(item);
@@ -56,7 +56,6 @@ public class ItemListener implements Listener {
         }
         return false;
     }
-
 
     private void updateItemMeta(@NotNull ItemStack oldItem, @NotNull ItemStack newItem) {
         ItemMeta oldMeta = oldItem.getItemMeta();
