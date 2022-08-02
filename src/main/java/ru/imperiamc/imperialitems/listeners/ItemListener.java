@@ -1,5 +1,6 @@
 package ru.imperiamc.imperialitems.listeners;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemHeldEvent;
@@ -10,35 +11,52 @@ import ru.imperiamc.imperialitems.ImperialItems;
 import ru.imperiamc.imperialitems.managers.RuleManager;
 import ru.imperiamc.imperialitems.models.ItemMo;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 public class ItemListener implements Listener {
 
-    private static final Logger LOG = Logger.getLogger(ItemListener.class.getName());
-
     @EventHandler
     public void onChangeItem(PlayerItemHeldEvent event) {
-        Arrays.stream(event.getPlayer().getInventory().getArmorContents()).filter(Objects::nonNull).forEach(this::tryToUpdateItem);
-        tryToUpdateItem(event.getPlayer().getInventory().getItemInMainHand());
-        tryToUpdateItem(event.getPlayer().getInventory().getItemInOffHand());
+        Player player = event.getPlayer();
+        boolean result = itemSoftUpdate(player);
+        if (result) {
+            itemAllUpdate(player);
+        }
     }
 
-    public void tryToUpdateItem(@NotNull ItemStack item) {
+    private boolean itemSoftUpdate(Player player) {
+        List<ItemStack> itemList =
+                new ArrayList<>(Arrays.stream(player.getInventory().getArmorContents())
+                        .filter(Objects::nonNull)
+                        .toList());
+        itemList.add(player.getInventory().getItemInMainHand());
+        itemList.add(player.getInventory().getItemInOffHand());
+
+        return itemList.stream().map(this::tryToUpdateItem).anyMatch(e -> e.equals(true));
+    }
+
+    private void itemAllUpdate(Player player) {
+        Arrays.stream(player.getInventory().getContents()).filter(Objects::nonNull).forEach(this::tryToUpdateItem);
+    }
+
+    public boolean tryToUpdateItem(@NotNull ItemStack item) {
         if (item.hasItemMeta() && item.getItemMeta().hasLore()) {
-            LOG.info("Начинаем проверку для предмета \n" + item.getType());
             RuleManager ruleManager = ImperialItems.getInstance().getRuleManager();
             ItemMo oldItem = new ItemMo(item);
             ItemMo replacement = ruleManager.getReplacement(new ItemMo(item));
             if (replacement != null) {
                 if (!replacement.equals(oldItem)) {
                     updateItemMeta(item, replacement.toItemStack());
-                    LOG.info("Предмет заменен");
+                    return true;
                 }
             }
         }
+        return false;
     }
+
 
     private void updateItemMeta(@NotNull ItemStack oldItem, @NotNull ItemStack newItem) {
         ItemMeta oldMeta = oldItem.getItemMeta();
