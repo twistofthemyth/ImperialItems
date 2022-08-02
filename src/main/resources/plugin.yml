@@ -5,9 +5,9 @@ api-version: 1.19
 authors: [ twistofthemyth ]
 website: imperia-mc.ru
 commands:
-  addrule:
+  ii:
     description: add item replacement rule
     usage: /<command>
-  updateitem:
+  ii add:
     description: add item replacement rule
     usage: /<command>

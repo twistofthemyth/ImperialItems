@@ -2,11 +2,11 @@ package ru.imperiamc.imperialitems;
 
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
-import ru.imperiamc.imperialitems.commands.AddItemCommand;
-import ru.imperiamc.imperialitems.commands.UpdateItemCommand;
 import ru.imperiamc.imperialitems.listeners.ItemListener;
 import ru.imperiamc.imperialitems.managers.JsonRuleManager;
 import ru.imperiamc.imperialitems.managers.RuleManager;
+
+import java.util.Objects;
 
 public final class ImperialItems extends JavaPlugin {
 
@@ -21,8 +21,7 @@ public final class ImperialItems extends JavaPlugin {
         instance = this;
         this.createDataFolder();
         this.getServer().getPluginManager().registerEvents(new ItemListener(), this);
-        this.getCommand("addrule").setExecutor(new AddItemCommand());
-        this.getCommand("updateitem").setExecutor(new UpdateItemCommand());
+        Objects.requireNonNull(this.getCommand("ii")).setExecutor(new CommandExecutorImpl());
         ruleManager = new JsonRuleManager();
     }
 
