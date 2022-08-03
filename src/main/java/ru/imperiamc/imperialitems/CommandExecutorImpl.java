@@ -1,6 +1,7 @@
 package ru.imperiamc.imperialitems;
 
 import net.kyori.adventure.text.Component;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -12,13 +13,22 @@ import ru.imperiamc.imperialitems.models.ItemMo;
 
 public class CommandExecutorImpl implements CommandExecutor {
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (sender instanceof Player player && args.length > 0) {
-            switch (args[0]) {
-                case "add" -> addItemCommand(player, args);
-                case "addlore" -> addLoreCommand(player, args, true);
-                case "addalore" -> addLoreCommand(player, args, false);
-                case "reload" -> reloadCommand();
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
+                             @NotNull String[] args) {
+        if (sender instanceof Player player) {
+            if (player.hasPermission("imperialitems.admin")) {
+                if (args.length > 0) {
+                    switch (args[0]) {
+                        case "add" -> addItemCommand(player, args);
+                        case "addlore" -> addLoreCommand(player, args, true);
+                        case "addalore" -> addLoreCommand(player, args, false);
+                        case "reload" -> reloadCommand();
+                    }
+                } else {
+                    sendHelp(player);
+                }
+            } else {
+                sendMessage(player, "Access denied", false);
             }
         }
         return true;
@@ -29,10 +39,11 @@ public class CommandExecutorImpl implements CommandExecutor {
             String ruleName = args[1];
             ItemStack item = player.getInventory().getItemInMainHand();
             if (addItemRule(ruleName, item)) {
-                sendMessage(player, String.format("Правило %s для %s успешно добавлено", ruleName, item.getType()));
+                sendMessage(player,
+                        String.format("Rule %s for material %s added", ruleName, item.getType()), true);
             }
         } else {
-            sendMessage(player, "Укажите название правила: /ii add <название_правила>");
+            sendHelp(player);
         }
     }
 
@@ -49,12 +60,13 @@ public class CommandExecutorImpl implements CommandExecutor {
                     ruleManager.addRuleSuitableLore(item.getType(), ruleName, suitableLore.toString().trim()) :
                     ruleManager.addRuleNotSuitableLore(item.getType(), ruleName, suitableLore.toString().trim());
             if (result) {
-                sendMessage(player, "Правило " + ruleName + "обновлено.");
+                sendMessage(player, "Rule " + ruleName + " updated", true);
             } else {
-                sendMessage(player, String.format("Правило %s для %s не найдено", ruleName, item.getType()));
+                sendMessage(player,
+                        String.format("Rule %s for material %s not found", ruleName, item.getType()), true);
             }
         } else {
-            sendMessage(player, String.format("Укажите необходимый лор для правила: /ii %s <название_правила> <лор>", isSuitable ? "addlore" : "addalore"));
+            sendHelp(player);
         }
     }
 
@@ -70,7 +82,19 @@ public class CommandExecutorImpl implements CommandExecutor {
         return false;
     }
 
-    private void sendMessage(@NotNull Player player, @NotNull String message) {
-        player.sendMessage(Component.text("[ImperialItems] " + message));
+    private void sendMessage(@NotNull Player player, @NotNull String message, boolean success) {
+        player.sendMessage(Component.text(ChatColor.GOLD + "[ImperialItems] "
+                + (success ? ChatColor.GREEN : ChatColor.RED) + message));
+    }
+
+    private void sendCommandHelp(@NotNull Player player, @NotNull String command, @NotNull String descr) {
+        player.sendMessage(Component.text(ChatColor.GOLD + command + " - " + ChatColor.GREEN + descr));
+    }
+
+    private void sendHelp(@NotNull Player player) {
+        sendCommandHelp(player, "/ii add <rule name>", "add rule for item in mainhand");
+        sendCommandHelp(player, "/ii addlore <rule name> <lore string>", "add lore filter for rule");
+        sendCommandHelp(player, "/ii addalore <rule name> <lore string>", "add inverted lore filter for rule");
+        sendCommandHelp(player, "/ii reload", "reload plugin");
     }
 }

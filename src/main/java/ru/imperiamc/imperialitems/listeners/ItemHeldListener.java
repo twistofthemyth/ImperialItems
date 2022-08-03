@@ -1,5 +1,8 @@
 package ru.imperiamc.imperialitems.listeners;
 
+import org.bukkit.ChatColor;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,8 +18,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Logger;
 
-public class ItemListener implements Listener {
+public class ItemHeldListener implements Listener {
 
     @EventHandler
     public void onItemHeld(PlayerItemHeldEvent event) {
@@ -24,10 +28,11 @@ public class ItemListener implements Listener {
         boolean result = itemSoftUpdate(player);
         if (result) {
             itemAllUpdate(player);
+            playUpdateEffect(player);
         }
     }
 
-    private boolean itemSoftUpdate(Player player) {
+    private boolean itemSoftUpdate(@NotNull Player player) {
         List<ItemStack> itemList =
                 new ArrayList<>(Arrays.stream(player.getInventory().getArmorContents())
                         .filter(Objects::nonNull)
@@ -35,10 +40,16 @@ public class ItemListener implements Listener {
         itemList.add(player.getInventory().getItemInMainHand());
         itemList.add(player.getInventory().getItemInOffHand());
 
-        return itemList.stream().map(this::tryToUpdateItem).anyMatch(e -> e.equals(true));
+        boolean result = false;
+        for (ItemStack item : itemList) {
+            if(tryToUpdateItem(item)){
+                result = true;
+            }
+        }
+        return result;
     }
 
-    private void itemAllUpdate(Player player) {
+    private void itemAllUpdate(@NotNull Player player) {
         Arrays.stream(player.getInventory().getContents()).filter(Objects::nonNull).forEach(this::tryToUpdateItem);
     }
 
@@ -50,6 +61,7 @@ public class ItemListener implements Listener {
             if (replacement != null) {
                 if (!replacement.equals(oldItem)) {
                     updateItemMeta(item, replacement.toItemStack());
+                    Logger.getAnonymousLogger().info("Item replaced");
                     return true;
                 }
             }
@@ -72,5 +84,12 @@ public class ItemListener implements Listener {
         oldMeta.setUnbreakable(newItem.getItemMeta().isUnbreakable());
 
         oldItem.setItemMeta(oldMeta);
+    }
+
+    private void playUpdateEffect(@NotNull Player player) {
+        player.sendMessage(ChatColor.RED + "Вы чувствуйте чье то злобное внимание");
+        player.sendMessage(ChatColor.DARK_RED + "Странная аура застилает ваши предметы");
+        player.playSound(player.getLocation(), Sound.ENTITY_FOX_TELEPORT, 10, 0);
+        player.spawnParticle(Particle.DRAGON_BREATH, player.getLocation(), 100, 1, 1, 1, 0.1);
     }
 }

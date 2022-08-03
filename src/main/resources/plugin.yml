@@ -4,6 +4,10 @@ main: ru.imperiamc.imperialitems.ImperialItems
 api-version: 1.19
 authors: [ twistofthemyth ]
 website: imperia-mc.ru
+permissions:
+  imperialitems.admin:
+    description: access to admin commands
+    default: false
 commands:
   ii:
     description: add item replacement rule

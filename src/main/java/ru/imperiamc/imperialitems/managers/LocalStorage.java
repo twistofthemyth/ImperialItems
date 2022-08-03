@@ -1,8 +1,9 @@
-package ru.imperiamc.imperialitems.models;
+package ru.imperiamc.imperialitems.managers;
 
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.imperiamc.imperialitems.models.ItemRecordMo;
 
 import java.util.*;
 

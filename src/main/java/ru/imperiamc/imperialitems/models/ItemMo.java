@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Data
@@ -24,7 +25,7 @@ public class ItemMo {
     @NotNull
     private List<TextMo> lore;
     @NotNull
-    private List<AttributeMo> attributes;
+    private Set<AttributeMo> attributes;
     @Nullable
     private Integer customModelData;
     @NotNull
@@ -34,9 +35,9 @@ public class ItemMo {
         Integer modelData = itemStack.getItemMeta().hasCustomModelData() ?
                 itemStack.getItemMeta().getCustomModelData() :
                 null;
-        List<AttributeMo> attributes = itemStack.getItemMeta().hasAttributeModifiers() ?
+        Set<AttributeMo> attributes = itemStack.getItemMeta().hasAttributeModifiers() ?
                 toAttributeModel(itemStack.getItemMeta().getAttributeModifiers()) :
-                new ArrayList<>();
+                new HashSet<>();
         List<TextMo> lore = itemStack.getItemMeta().hasLore() ?
                 itemStack.getItemMeta().lore().stream().map(TextMo::new).collect(Collectors.toList()) :
                 new ArrayList<>();
@@ -54,30 +55,40 @@ public class ItemMo {
 
             //lore
             if (lore.size() != itemMo.getLore().size()) {
+                Logger.getAnonymousLogger().info("lore size not equal");
                 return false;
             }
             for (int i = 0; i < lore.size(); i++) {
-                if (!lore.get(i).equals(itemMo.getLore().get(i))) {
+                if (!lore.get(i).getText().equals(itemMo.getLore().get(i).getText())) {
+                    Logger.getAnonymousLogger().info("lore content not equal");
                     return false;
                 }
             }
 
             //attributes
-            if (!attributes.equals(itemMo.getAttributes())) {
+            if (attributes.size() != itemMo.getAttributes().size()) {
+                Logger.getAnonymousLogger().info("attributes size equal");
+                return false;
+            }
+
+            if (!attributes.stream().allMatch(e -> e.contained(itemMo.getAttributes()))) {
+                Logger.getAnonymousLogger().info("attributes content not equal");
                 return false;
             }
 
             //customModelData
             if (customModelData != null && itemMo.getCustomModelData() != null) {
                 if (!this.customModelData.equals(itemMo.getCustomModelData())) {
+                    Logger.getAnonymousLogger().info("CMD not equal");
                     return false;
                 }
             } else if (customModelData == null && itemMo.getCustomModelData() != null) {
+                Logger.getAnonymousLogger().info("CMD not equal (new is unset)");
                 return false;
             } else if (customModelData != null) {
+                Logger.getAnonymousLogger().info("CMD not equal (new is set)");
                 return false;
             }
-
             return true;
         }
         return false;
@@ -112,13 +123,13 @@ public class ItemMo {
                 attributeMo.getOperation(), attributeMo.getSlot());
     }
 
-    private static List<AttributeMo> toAttributeModel(Multimap<Attribute, AttributeModifier> attributeMap) {
-        List<AttributeMo> attributeMoList = new ArrayList<>();
+    private static Set<AttributeMo> toAttributeModel(Multimap<Attribute, AttributeModifier> attributeMap) {
+        Set<AttributeMo> attributeMoList = new HashSet<>();
         attributeMap.forEach((attribute, modifier) -> attributeMoList.add(toAttributeModel(attribute, modifier)));
         return attributeMoList;
     }
 
-    private static Multimap<Attribute, AttributeModifier> fromAttributeModel(List<AttributeMo> attributeMoList) {
+    private static Multimap<Attribute, AttributeModifier> fromAttributeModel(Set<AttributeMo> attributeMoList) {
         Map<Attribute, AttributeModifier> attributeAttributeModifierMap = new HashMap<>();
         attributeMoList.forEach(e -> attributeAttributeModifierMap.put(e.getType(), fromAttributeModel(e)));
         return Multimaps.forMap(attributeAttributeModifierMap);
