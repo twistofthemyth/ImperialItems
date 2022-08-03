@@ -8,7 +8,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
-import java.util.logging.Logger;
 
 @Data
 @Accessors(chain = true)
@@ -36,28 +35,10 @@ public class AttributeMo {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof AttributeMo attribute) {
-            if (!this.type.name().equals(attribute.getType().name())) {
-                Logger.getAnonymousLogger().info("attribute type not equals");
-                Logger.getAnonymousLogger().info(type.name());
-                Logger.getAnonymousLogger().info(attribute.getType().name());
-                return false;
-            }
-
-            if (!this.slot.name().equals(attribute.getSlot().name())) {
-                Logger.getAnonymousLogger().info("attribute slot not equals");
-                return false;
-            }
-
-            if (!this.operation.name().equals(attribute.operation.name())) {
-                Logger.getAnonymousLogger().info("attribute operation not equals");
-                return false;
-            }
-
-            if (!(this.amount == attribute.amount)) {
-                Logger.getAnonymousLogger().info("attribute amount not equals");
-                return false;
-            }
-            return true;
+            return type.name().equals(attribute.getType().name()) &&
+                    slot.name().equals(attribute.getSlot().name()) &&
+                    operation.name().equals(attribute.operation.name()) &&
+                    amount == attribute.amount;
         }
         return false;
     }

@@ -61,7 +61,6 @@ public class ItemHeldListener implements Listener {
             if (replacement != null) {
                 if (!replacement.equals(oldItem)) {
                     updateItemMeta(item, replacement.toItemStack());
-                    Logger.getAnonymousLogger().info("Item replaced");
                     return true;
                 }
             }

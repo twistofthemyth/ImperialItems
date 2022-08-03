@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 public class JsonRuleManager extends AbstractRuleManager {
 
-    private final static Logger LOG = Logger.getLogger(RuleManager.class.getCanonicalName());
+    private final static Logger LOG = Logger.getLogger("ImperialItems");
     private final File dataFolder;
     private final Gson gson;
 

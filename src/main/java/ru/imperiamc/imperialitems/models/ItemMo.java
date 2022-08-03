@@ -55,38 +55,31 @@ public class ItemMo {
 
             //lore
             if (lore.size() != itemMo.getLore().size()) {
-                Logger.getAnonymousLogger().info("lore size not equal");
                 return false;
             }
             for (int i = 0; i < lore.size(); i++) {
                 if (!lore.get(i).getText().equals(itemMo.getLore().get(i).getText())) {
-                    Logger.getAnonymousLogger().info("lore content not equal");
                     return false;
                 }
             }
 
             //attributes
             if (attributes.size() != itemMo.getAttributes().size()) {
-                Logger.getAnonymousLogger().info("attributes size equal");
                 return false;
             }
 
             if (!attributes.stream().allMatch(e -> e.contained(itemMo.getAttributes()))) {
-                Logger.getAnonymousLogger().info("attributes content not equal");
                 return false;
             }
 
             //customModelData
             if (customModelData != null && itemMo.getCustomModelData() != null) {
                 if (!this.customModelData.equals(itemMo.getCustomModelData())) {
-                    Logger.getAnonymousLogger().info("CMD not equal");
                     return false;
                 }
             } else if (customModelData == null && itemMo.getCustomModelData() != null) {
-                Logger.getAnonymousLogger().info("CMD not equal (new is unset)");
                 return false;
             } else if (customModelData != null) {
-                Logger.getAnonymousLogger().info("CMD not equal (new is set)");
                 return false;
             }
             return true;
