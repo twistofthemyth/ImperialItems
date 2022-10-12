@@ -2,8 +2,8 @@ package ru.imperiamc.imperialitems;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import ru.imperiamc.imperialitems.ImperialItems;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
@@ -44,8 +44,8 @@ public class ItemFileManager {
     }
 
     @Nullable
-    public ItemStack get(String component) {
-        File componentFile = Path.of(folder.toString(), component).toFile();
+    public ItemStack get(String itemName) {
+        File componentFile = Path.of(folder.toString(), itemName).toFile();
         try (FileInputStream fis = new FileInputStream(componentFile)) {
             return ItemStack.deserializeBytes(fis.readAllBytes());
         } catch (IOException e) {
@@ -53,11 +53,17 @@ public class ItemFileManager {
         }
     }
 
-    public void remove(String component) {
-        File componentFile = Path.of(folder.toString(), component).toFile();
+    @Nonnull
+    public ItemStack getOrDefault(String item) {
+        ItemStack itemStack = get(item);
+        return itemStack == null ? new ItemStack(Material.BEDROCK, 1) : itemStack;
+    }
+
+    public void remove(String itemName) {
+        File componentFile = Path.of(folder.toString(), itemName).toFile();
         if (componentFile.exists()) {
             componentFile.delete();
         }
-        plugin.getLogger().info(() -> "Item file removed: " + component);
+        plugin.getLogger().info(() -> "Item file removed: " + itemName);
     }
 }
