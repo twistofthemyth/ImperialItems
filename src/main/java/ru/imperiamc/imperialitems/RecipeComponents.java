@@ -1,4 +1,4 @@
-package ru.imperiamc.imperialitems.recipe;
+package ru.imperiamc.imperialitems;
 
 import lombok.Getter;
 

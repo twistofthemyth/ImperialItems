@@ -1,4 +1,4 @@
-package ru.imperiamc.imperialitems.listeners;
+package ru.imperiamc.imperialitems;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
@@ -10,17 +10,19 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
-import ru.imperiamc.imperialitems.ImperialItems;
-import ru.imperiamc.imperialitems.managers.RuleManager;
-import ru.imperiamc.imperialitems.models.ItemMo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 public class ItemHeldListener implements Listener {
+
+    private final ImperialItems plugin;
+
+    public ItemHeldListener(ImperialItems plugin) {
+        this.plugin = plugin;
+    }
 
     @EventHandler
     public void onItemHeld(PlayerItemHeldEvent event) {
@@ -33,16 +35,15 @@ public class ItemHeldListener implements Listener {
     }
 
     private boolean itemSoftUpdate(@NotNull Player player) {
-        List<ItemStack> itemList =
-                new ArrayList<>(Arrays.stream(player.getInventory().getArmorContents())
-                        .filter(Objects::nonNull)
-                        .toList());
+        List<ItemStack> itemList = new ArrayList<>(Arrays.stream(player.getInventory().getArmorContents())
+                .filter(Objects::nonNull)
+                .toList());
         itemList.add(player.getInventory().getItemInMainHand());
         itemList.add(player.getInventory().getItemInOffHand());
 
         boolean result = false;
         for (ItemStack item : itemList) {
-            if(tryToUpdateItem(item)){
+            if (tryToUpdateItem(item)) {
                 result = true;
             }
         }
@@ -54,21 +55,18 @@ public class ItemHeldListener implements Listener {
     }
 
     private boolean tryToUpdateItem(@NotNull ItemStack item) {
-        if (item.hasItemMeta() && item.getItemMeta().hasLore()) {
-            RuleManager ruleManager = ImperialItems.getInstance().getRuleManager();
-            ItemMo oldItem = new ItemMo(item);
-            ItemMo replacement = ruleManager.getReplacement(new ItemMo(item));
-            if (replacement != null) {
-                if (!replacement.equals(oldItem)) {
-                    updateItemMeta(item, replacement.toItemStack());
-                    return true;
-                }
+        if (item.hasItemMeta() && item.getItemMeta().hasCustomModelData()) {
+            ItemFileManager referenceManager = plugin.getReferenceItemManager();
+            ItemStack reference = referenceManager.get(item.getType().name() + item.getItemMeta().getCustomModelData());
+            if (reference != null && !compareItems(item, reference)) {
+                updateItem(item, reference);
+                return true;
             }
         }
         return false;
     }
 
-    private void updateItemMeta(@NotNull ItemStack oldItem, @NotNull ItemStack newItem) {
+    private void updateItem(@NotNull ItemStack oldItem, @NotNull ItemStack newItem) {
         ItemMeta oldMeta = oldItem.getItemMeta();
         ItemMeta newMeta = newItem.getItemMeta();
         if (newMeta.hasLore()) {
@@ -90,5 +88,31 @@ public class ItemHeldListener implements Listener {
         player.sendMessage(ChatColor.DARK_RED + "Странная аура застилает ваши предметы");
         player.playSound(player.getLocation(), Sound.ENTITY_FOX_TELEPORT, 10, 0);
         player.spawnParticle(Particle.DRAGON_BREATH, player.getLocation(), 100, 1, 1, 1, 0.1);
+    }
+
+    private boolean compareItems(ItemStack actual, ItemStack reference) {
+        ItemMeta actualMeta = actual.getItemMeta();
+        ItemMeta referenceMeta = reference.getItemMeta();
+
+        // Lore compare
+        if (actualMeta.hasLore() != referenceMeta.hasLore()) {
+            return false;
+        }
+        if (actualMeta.hasLore() &&
+                !actualMeta.lore().equals(referenceMeta.lore())) {
+            return false;
+        }
+
+
+        // Attributes compare
+        if (actualMeta.hasAttributeModifiers() != referenceMeta.hasAttributeModifiers()) {
+            return false;
+        }
+        if (actualMeta.hasAttributeModifiers() &&
+                !actualMeta.getAttributeModifiers().equals(referenceMeta.getAttributeModifiers())) {
+            return false;
+        }
+
+        return true;
     }
 }

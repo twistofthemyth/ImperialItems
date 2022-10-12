@@ -7,8 +7,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import ru.imperiamc.imperialitems.managers.RuleManager;
-import ru.imperiamc.imperialitems.models.ItemMo;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -23,84 +21,47 @@ public class CommandExecutorImpl implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player player) {
-            if (player.hasPermission("imperialitems.admin")) {
-                if (args.length > 0) {
-                    switch (args[0]) {
-                        case "add" -> addItemCommand(player, args);
-                        case "addrecipe" -> addRecipeComponentCommand(player, args);
-                        case "addlore" -> addLoreCommand(player, args, true);
-                        case "addalore" -> addLoreCommand(player, args, false);
-                        case "reload" -> reloadCommand();
-                    }
-                } else {
-                    sendHelp(player);
-                }
+        if (sender instanceof Player player && player.hasPermission("imperialitems.admin")) {
+            if (args.length == 2 && "add".equals(args[0]) && "reference".equals(args[1])) {
+                addItemReferenceCommand(player);
+            } else if (args.length == 2 && "remove".equals(args[0]) && "reference".equals(args[1])) {
+                removeItemReferenceCommand(player);
+            } else if (args.length == 3 && "add".equals(args[0]) && "recipe".equals(args[1])) {
+                addRecipeComponentCommand(player, args[2]);
+            } else if (args.length == 3 && "remove".equals(args[0]) && "recipe".equals(args[1])) {
+                removeRecipeComponentCommand(player, args[2]);
             } else {
-                sendMessage(player, "Access denied", false);
+                sendHelp(player);
             }
         }
         return true;
     }
 
-    private void addItemCommand(Player player, String[] args) {
-        if (args.length == 2) {
-            String ruleName = args[1];
-            ItemStack item = player.getInventory().getItemInMainHand();
-            if (addItemRule(ruleName, item)) {
-                sendMessage(player,
-                        String.format("Rule %s for material %s added", ruleName, item.getType()), true);
-            }
-        } else {
-            sendHelp(player);
-        }
+    private void addItemReferenceCommand(Player player) {
+        ItemStack item = player.getInventory().getItemInMainHand();
+        String referenceName = item.getType().name() + item.getItemMeta().getCustomModelData();
+        plugin.getReferenceItemManager().add(item, referenceName);
+        sendMessage(player,
+                String.format("Item reference %s added", referenceName), true);
     }
 
-    private void addRecipeComponentCommand(Player player, String[] args) {
-        if (args.length > 1) {
-            String componentName = args[1];
-            ItemStack item = player.getInventory().getItemInMainHand();
-            plugin.getRecipeComponentManager().add(item, componentName);
-            sendMessage(player,
-                    String.format("Recipe component %s added", componentName), true);
-        } else {
-            sendMessage(player, "Internal error", false);
-        }
+    private void removeItemReferenceCommand(Player player) {
+        ItemStack item = player.getInventory().getItemInMainHand();
+        String referenceName = item.getType().name() + item.getItemMeta().getCustomModelData();
+        plugin.getReferenceItemManager().remove(referenceName);
+        sendMessage(player,
+                String.format("Item reference %s removed", referenceName), true);
     }
 
-    private void addLoreCommand(Player player, String[] args, boolean isSuitable) {
-        if (args.length > 2) {
-            RuleManager ruleManager = plugin.getRuleManager();
-            String ruleName = args[1];
-            ItemStack item = player.getInventory().getItemInMainHand();
-            StringBuilder suitableLore = new StringBuilder();
-            for (int i = 2; i < args.length; i++) {
-                suitableLore.append(args[i]).append(" ");
-            }
-            boolean result = isSuitable ?
-                    ruleManager.addRuleSuitableLore(item.getType(), ruleName, suitableLore.toString().trim()) :
-                    ruleManager.addRuleNotSuitableLore(item.getType(), ruleName, suitableLore.toString().trim());
-            if (result) {
-                sendMessage(player, "Rule " + ruleName + " updated", true);
-            } else {
-                sendMessage(player,
-                        String.format("Rule %s for material %s not found", ruleName, item.getType()), true);
-            }
-        } else {
-            sendHelp(player);
-        }
+    private void addRecipeComponentCommand(Player player, String itemName) {
+        ItemStack item = player.getInventory().getItemInMainHand();
+        plugin.getRecipeComponentManager().add(item, itemName);
+        sendMessage(player, String.format("Recipe component %s added", item), true);
     }
 
-    private void reloadCommand() {
-        plugin.getRuleManager().load();
-    }
-
-    private boolean addItemRule(String loreSign, ItemStack itemStack) {
-        if (itemStack.getItemMeta().hasLore()) {
-            plugin.getRuleManager().addRule(loreSign, new ItemMo(itemStack));
-            return true;
-        }
-        return false;
+    private void removeRecipeComponentCommand(Player player, String itemName) {
+        plugin.getReferenceItemManager().remove(itemName);
+        sendMessage(player, String.format("Recipe component %s removed", itemName), true);
     }
 
     private void sendMessage(Player player, String message, boolean success) {
@@ -112,10 +73,11 @@ public class CommandExecutorImpl implements CommandExecutor {
         player.sendMessage(Component.text(ChatColor.GOLD + command + " - " + ChatColor.GREEN + descr));
     }
 
+
     private void sendHelp(Player player) {
-        sendCommandHelp(player, "/ii add <rule name>", "add rule for item in mainhand");
-        sendCommandHelp(player, "/ii addlore <rule name> <lore string>", "add lore filter for rule");
-        sendCommandHelp(player, "/ii addalore <rule name> <lore string>", "add inverted lore filter for rule");
-        sendCommandHelp(player, "/ii reload", "reload plugin");
+        sendCommandHelp(player, "/ii add reference ", "add item held on main hand as replacement rule");
+        sendCommandHelp(player, "/ii add recipe <component name>", "adds item held on main hand as recipe component");
+        sendCommandHelp(player, "/ii remove reference", "remove item held on main hand from replacement rules");
+        sendCommandHelp(player, "/ii remove recipe", "remove recipe component");
     }
 }

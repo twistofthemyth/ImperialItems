@@ -1,11 +1,11 @@
-package ru.imperiamc.imperialitems.recipe;
+package ru.imperiamc.imperialitems;
 
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ShapedRecipe;
 import ru.imperiamc.imperialitems.ImperialItems;
-import ru.imperiamc.imperialitems.managers.RecipeComponentManager;
+import ru.imperiamc.imperialitems.ItemFileManager;
 
-import static ru.imperiamc.imperialitems.recipe.RecipeComponents.*;
+import static ru.imperiamc.imperialitems.RecipeComponents.*;
 
 public class ShapedRecipes {
     private final ImperialItems plugin;
@@ -15,7 +15,7 @@ public class ShapedRecipes {
     }
 
     public ShapedRecipe bloodyMap() {
-        RecipeComponentManager componentManager = plugin.getRecipeComponentManager();
+        ItemFileManager componentManager = plugin.getRecipeComponentManager();
         ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(plugin, BLOODY_MAP.getKey()),
                 componentManager.get(BLOODY_MAP.getName()));
         recipe.shape("FFF", "FBF", "FFF");
