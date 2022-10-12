@@ -24,3 +24,6 @@ commands:
   ii reload:
     description: add item replacement rule
     usage: /<command>
+  ii addrecipe:
+    description: adds item held on main hand as recipe component
+    usage: /<command> <component name>
