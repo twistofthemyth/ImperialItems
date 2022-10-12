@@ -12,7 +12,7 @@ public class ShapedRecipes {
         this.plugin = plugin;
     }
 
-    public ShapedRecipe bloodyMap() {
+    public ShapedRecipe bewitchedAmeliaSword() {
         ItemFileManager componentManager = plugin.getRecipeComponentManager();
         ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(plugin, BEWITCHED_AMELIA_SWORD.getKey()),
                 componentManager.getOrDefault(BEWITCHED_AMELIA_SWORD.getName()));
@@ -22,7 +22,7 @@ public class ShapedRecipes {
         return recipe;
     }
 
-    public ShapedRecipe bewitchedAmeliaSword() {
+    public ShapedRecipe bloodyMap() {
         ItemFileManager componentManager = plugin.getRecipeComponentManager();
         ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(plugin, BLOODY_MAP.getKey()),
                 componentManager.getOrDefault(BLOODY_MAP.getName()));

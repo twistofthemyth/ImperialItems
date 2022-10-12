@@ -23,6 +23,7 @@ public final class ImperialItems extends JavaPlugin {
 
         ShapedRecipes recipes = new ShapedRecipes(this);
         getServer().addRecipe(recipes.bloodyMap());
+        getServer().addRecipe(recipes.bewitchedAmeliaSword());
     }
 
     private void createDataFolder() {
