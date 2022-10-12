@@ -12,15 +12,16 @@ commands:
   ii:
     description: add item replacement rule
     usage: /<command>
-  ii add:
-    description: add item replacement rule
+  ii add reference:
+    description: add item held on main hand as replacement rule
     usage: /<command>
-  ii addlore:
-    description: add item replacement rule
+  ii remove reference:
+    description: remove item held on main hand from replacement rules
     usage: /<command>
-  ii addalore:
-    description: add item replacement rule
-    usage: /<command>
-  ii reload:
-    description: add item replacement rule
-    usage: /<command>
+  ii add recipe:
+    description: adds item held on main hand as recipe component
+    usage: /<command> <component name>
+  ii remove recipe:
+    description: remove recipe component
+    usage: /<command> <component name>
+

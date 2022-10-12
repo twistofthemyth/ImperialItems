@@ -2,32 +2,27 @@ package ru.imperiamc.imperialitems;
 
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
-import ru.imperiamc.imperialitems.listeners.ItemHeldListener;
-import ru.imperiamc.imperialitems.managers.JsonRuleManager;
-import ru.imperiamc.imperialitems.managers.RuleManager;
 
+import java.nio.file.Paths;
 import java.util.Objects;
 
 public final class ImperialItems extends JavaPlugin {
-
     @Getter
-    private static ImperialItems instance;
-
+    private ItemFileManager recipeComponentManager;
     @Getter
-    private RuleManager ruleManager;
+    private ItemFileManager referenceItemManager;
 
     @Override
     public void onEnable() {
-        instance = this;
-        this.createDataFolder();
-        this.getServer().getPluginManager().registerEvents(new ItemHeldListener(), this);
-        Objects.requireNonNull(this.getCommand("ii")).setExecutor(new CommandExecutorImpl());
-        ruleManager = new JsonRuleManager();
-    }
+        createDataFolder();
+        recipeComponentManager = new ItemFileManager(this, Paths.get(getDataFolder().getPath(), "recipes"));
+        referenceItemManager = new ItemFileManager(this, Paths.get(getDataFolder().getPath(), "references"));
 
-    @Override
-    public void onDisable() {
-        ruleManager.save();
+        getServer().getPluginManager().registerEvents(new ItemHeldListener(this), this);
+        Objects.requireNonNull(getCommand("ii")).setExecutor(new CommandExecutorImpl(this));
+
+        ShapedRecipes recipes = new ShapedRecipes(this);
+        getServer().addRecipe(recipes.bloodyMap());
     }
 
     private void createDataFolder() {
