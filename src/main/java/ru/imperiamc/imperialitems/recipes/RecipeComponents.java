@@ -1,8 +1,13 @@
-package ru.imperiamc.imperialitems;
+package ru.imperiamc.imperialitems.recipes;
 
 import lombok.Getter;
 
 public enum RecipeComponents {
+
+    BLESSED_AMETHYST_SHARD("BlessedAmethystShard"),
+    CURSED_AMETHYST_SHARD("CursedAmethystShard"),
+    ENCHANTED_AMETHYST_SHARD("EnchantedAmethystShard"),
+    REDSTONE_AMETHYST_SHARD("RedstoneAmethystShard"),
     BLOODY_MAP("BloodyMap"),
     BEAST_BLOOD("BeastBlood"),
     BLOODY_MAP_FRAGMENT("BloodyMapFragment"),

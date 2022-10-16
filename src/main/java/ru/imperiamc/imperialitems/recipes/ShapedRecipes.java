@@ -1,9 +1,11 @@
-package ru.imperiamc.imperialitems;
+package ru.imperiamc.imperialitems.recipes;
 
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ShapedRecipe;
+import ru.imperiamc.imperialitems.ImperialItems;
+import ru.imperiamc.imperialitems.ItemFileManager;
 
-import static ru.imperiamc.imperialitems.RecipeComponents.*;
+import static ru.imperiamc.imperialitems.recipes.RecipeComponents.*;
 
 public class ShapedRecipes {
     private final ImperialItems plugin;
