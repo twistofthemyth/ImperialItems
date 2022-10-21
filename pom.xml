@@ -6,7 +6,7 @@
 
     <groupId>ru.imperia-mc</groupId>
     <artifactId>ImperialItems</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.4-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>ImperialItems</name>

@@ -2,6 +2,7 @@ package ru.imperiamc.imperialitems;
 
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
+import ru.imperiamc.imperialitems.keep.KeepInventoryListener;
 import ru.imperiamc.imperialitems.recipes.ShapedRecipes;
 import ru.imperiamc.imperialitems.recipes.ShapelessRecipes;
 import ru.imperiamc.imperialitems.silk.SilkTouchListener;
@@ -37,6 +38,7 @@ public final class ImperialItems extends JavaPlugin {
 
         // Event Listeners
         getServer().getPluginManager().registerEvents(new SilkTouchListener(), this);
+        getServer().getPluginManager().registerEvents(new KeepInventoryListener(), this);
     }
 
     private void createDataFolder() {
