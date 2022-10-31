@@ -10,6 +10,8 @@ import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import static java.lang.String.format;
+
 @ParametersAreNonnullByDefault
 public class CommandExecutorImpl implements CommandExecutor {
 
@@ -22,7 +24,9 @@ public class CommandExecutorImpl implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player player && player.hasPermission("imperialitems.admin")) {
-            if (args.length == 2 && "add".equals(args[0]) && "reference".equals(args[1])) {
+            if (args.length == 1 && "reload".equals(args[0])) {
+                reloadCommand(player);
+            } else if (args.length == 2 && "add".equals(args[0]) && "reference".equals(args[1])) {
                 addItemReferenceCommand(player);
             } else if (args.length == 2 && "remove".equals(args[0]) && "reference".equals(args[1])) {
                 removeItemReferenceCommand(player);
@@ -37,31 +41,34 @@ public class CommandExecutorImpl implements CommandExecutor {
         return true;
     }
 
+    private void reloadCommand(Player player) {
+        plugin.reload();
+        sendMessage(player, "Plugin reloaded", true);
+    }
+
     private void addItemReferenceCommand(Player player) {
         ItemStack item = player.getInventory().getItemInMainHand();
         String referenceName = item.getType().name() + item.getItemMeta().getCustomModelData();
         plugin.getReferenceItemManager().add(item, referenceName);
-        sendMessage(player,
-                String.format("Item reference %s added", referenceName), true);
+        sendMessage(player, format("Item reference %s added", referenceName), true);
     }
 
     private void removeItemReferenceCommand(Player player) {
         ItemStack item = player.getInventory().getItemInMainHand();
         String referenceName = item.getType().name() + item.getItemMeta().getCustomModelData();
         plugin.getReferenceItemManager().remove(referenceName);
-        sendMessage(player,
-                String.format("Item reference %s removed", referenceName), true);
+        sendMessage(player, format("Item reference %s removed", referenceName), true);
     }
 
     private void addRecipeComponentCommand(Player player, String itemName) {
         ItemStack item = player.getInventory().getItemInMainHand();
         plugin.getRecipeComponentManager().add(item, itemName);
-        sendMessage(player, String.format("Recipe component %s added", item), true);
+        sendMessage(player, format("Recipe component %s added", item), true);
     }
 
     private void removeRecipeComponentCommand(Player player, String itemName) {
         plugin.getReferenceItemManager().remove(itemName);
-        sendMessage(player, String.format("Recipe component %s removed", itemName), true);
+        sendMessage(player, format("Recipe component %s removed", itemName), true);
     }
 
     private void sendMessage(Player player, String message, boolean success) {
@@ -72,7 +79,6 @@ public class CommandExecutorImpl implements CommandExecutor {
     private void sendCommandHelp(Player player, String command, String descr) {
         player.sendMessage(Component.text(ChatColor.GOLD + command + " - " + ChatColor.GREEN + descr));
     }
-
 
     private void sendHelp(Player player) {
         sendCommandHelp(player, "/ii add reference ", "add item held on main hand as replacement rule");

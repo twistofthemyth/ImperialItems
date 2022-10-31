@@ -11,6 +11,10 @@ import java.nio.file.Paths;
 import java.util.Objects;
 
 public final class ImperialItems extends JavaPlugin {
+
+    private final ShapedRecipes shapedRecipes = new ShapedRecipes(this);
+    private final ShapelessRecipes shapelessRecipes = new ShapelessRecipes(this);
+
     @Getter
     private ItemFileManager recipeComponentManager;
     @Getter
@@ -26,24 +30,30 @@ public final class ImperialItems extends JavaPlugin {
         Objects.requireNonNull(getCommand("ii")).setExecutor(new CommandExecutorImpl(this));
 
         // Recipes
-        ShapedRecipes recipes = new ShapedRecipes(this);
-        ShapelessRecipes shapelessRecipes = new ShapelessRecipes(this);
-
-        getServer().addRecipe(recipes.bloodyMap());
-        getServer().addRecipe(recipes.bewitchedAmeliaSword());
-        getServer().addRecipe(shapelessRecipes.enchantedAmethystShard());
-        getServer().addRecipe(shapelessRecipes.cursedAmethystShard());
-        getServer().addRecipe(shapelessRecipes.blessedAmethystShard());
-        getServer().addRecipe(shapelessRecipes.redstoneAmethystShard());
+        addRecipes();
 
         // Event Listeners
         getServer().getPluginManager().registerEvents(new SilkTouchListener(), this);
         getServer().getPluginManager().registerEvents(new KeepInventoryListener(), this);
     }
 
+    public void reload() {
+        getServer().resetRecipes();
+        addRecipes();
+    }
+
     private void createDataFolder() {
         if (!getDataFolder().exists()) {
             getDataFolder().mkdir();
         }
+    }
+
+    private void addRecipes() {
+        getServer().addRecipe(shapedRecipes.bloodyMap());
+        getServer().addRecipe(shapedRecipes.bewitchedAmeliaSword());
+        getServer().addRecipe(shapelessRecipes.enchantedAmethystShard());
+        getServer().addRecipe(shapelessRecipes.cursedAmethystShard());
+        getServer().addRecipe(shapelessRecipes.blessedAmethystShard());
+        getServer().addRecipe(shapelessRecipes.redstoneAmethystShard());
     }
 }

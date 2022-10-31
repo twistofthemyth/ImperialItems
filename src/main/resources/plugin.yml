@@ -24,4 +24,7 @@ commands:
   ii remove recipe:
     description: remove recipe component
     usage: /<command> <component name>
+  ii reload:
+    description: reload recipes and configs
+    usage: /<command>
 
